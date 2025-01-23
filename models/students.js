@@ -1,8 +1,8 @@
-// Import necessary modules
 import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
 import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
 import bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 
+//
 const Student = sequelize.define('Student', {
 
     studentID: {
@@ -66,18 +66,23 @@ const Student = sequelize.define('Student', {
         defaultValue: 'Active',
       },
 
-      major: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-
-      minor: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      
-
+      majorID: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Major, // Reference to Major model
+            key: 'majorID',
+        },
+        allowNull: false, // A student must have a major
+    },
+    
+    minorID: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Minor, // Reference to Minor model
+            key: 'minorID',
+        },
+        allowNull: true, // Minor is optional
+    },
     });
 
-    export default student;
+    export default Student;

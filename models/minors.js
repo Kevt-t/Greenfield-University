@@ -3,7 +3,7 @@ const Minor = sequelize.define('Minor', {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-      allowNull: false, 
+      allowNull: false,
     },
   
     minorName: {
@@ -14,6 +14,13 @@ const Minor = sequelize.define('Minor', {
         len: [2, 100],
       },
     },
+
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true, // Might be optional
+      validate: {
+          len: [0, 500], // Limits the length of the description
+      }},
   
     duration: {
       type: DataTypes.INTEGER, // Duration in years
