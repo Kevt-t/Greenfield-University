@@ -14,6 +14,10 @@ const Major = sequelize.define('Major', {
         len: [2, 100], // Restrict length to reasonable limits
       },
     },
+
+    type: {
+      type: DataTypes.ENUM('Associates','Bachelors','Masters')
+    },
   
     duration: {
       type: DataTypes.INTEGER, // Duration in years

@@ -3,7 +3,7 @@ const Minor = sequelize.define('Minor', {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-      allowNull: false,
+      allowNull: false, 
     },
   
     minorName: {

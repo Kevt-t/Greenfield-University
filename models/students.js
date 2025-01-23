@@ -76,6 +76,8 @@ const Student = sequelize.define('Student', {
         allowNull: true,
       },
 
+      
+
     });
 
     export default student;
