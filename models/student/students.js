@@ -2,7 +2,6 @@ import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for de
 import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
 import bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 
-//
 const Student = sequelize.define('Student', {
 
     studentID: {
@@ -85,4 +84,4 @@ const Student = sequelize.define('Student', {
     },
     });
 
-    export default Student;
+export default Student;

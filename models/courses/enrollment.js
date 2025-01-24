@@ -1,3 +1,6 @@
+import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
+import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
+
 const Enrollment = sequelize.define('Enrollment', {
     enrollmentID: {
       type: DataTypes.INTEGER,
@@ -33,3 +36,5 @@ const Enrollment = sequelize.define('Enrollment', {
   }, {
     timestamps: false,
   });
+
+  export default Enrollment;

@@ -1,43 +1,42 @@
-const Major = sequelize.define('Major', {
-    majorID: {
+import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
+import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
+
+const Minor = sequelize.define('Minor', {
+    minorID: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
     },
   
-    majorName: {
+    minorName: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
-        len: [2, 100], // Restrict length to reasonable limits
+        len: [2, 100],
       },
     },
 
-    type: {
-      type: DataTypes.ENUM('Associates','Bachelors','Masters','Doctorate')
-    },
-    
     description: {
       type: DataTypes.STRING,
       allowNull: true, // Might be optional
       validate: {
           len: [0, 500], // Limits the length of the description
       }},
-
+  
     duration: {
       type: DataTypes.INTEGER, // Duration in years
       allowNull: false,
       validate: {
-        min: 1, // At least 1 year
-        max: 7, // Arbitrary maximum for flexibility
+        min: 1, // At least 1 year for minors
+        max: 3, // Minors usually have shorter durations
       },
     },
   },
   {
-    timestamps: false, // Majors don't usually require timestamps
+    timestamps: false,
   });
   
-  export default Major;
+export default Minor;
   

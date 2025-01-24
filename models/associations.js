@@ -1,10 +1,11 @@
-// Import all models
+import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
+import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
 import Student from './student.js';
-import Major from './majors.js';
-import Minor from './minors.js';
-import Course from './courses.js';
-import Instructor from './instructors.js';
-import Enrollment from './enrollment.js';
+import Major from './student/majors.js';
+import Minor from './student/minors.js';
+import Course from './courses/courses.js';
+import Instructor from './courses/instructors.js';
+import Enrollment from './courses/enrollment.js';
 
 // Students
 Student.belongsTo(Major, { foreignKey: 'majorID', as: 'major' });

@@ -1,3 +1,6 @@
+import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
+import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
+
 const Instructor = sequelize.define('Instructor', {
     instructorID: {
       type: DataTypes.INTEGER,
@@ -42,5 +45,5 @@ const Instructor = sequelize.define('Instructor', {
     timestamps: true, // Adds `createdAt` and `updatedAt`
   });
   
-  export default Instructor;
+export default Instructor;
   
