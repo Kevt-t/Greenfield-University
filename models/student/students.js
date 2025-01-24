@@ -82,6 +82,12 @@ const Student = sequelize.define('Student', {
         },
         allowNull: true, // Minor is optional
     },
+    
+    isAccountActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // Accounts are inactive by default
+    },
+
     });
 
 export default Student;

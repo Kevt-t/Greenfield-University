@@ -32,23 +32,6 @@ app
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 
-// Protected route for dashboard
-app.get('/dashboard', authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findByPk(req.user.userId, {
-      include: { model: Transaction, as: 'transactions', order: [['createdAt', 'DESC']] },
-    });
-
-    if (!user) {
-      return res.status(404).send('User not found.');
-    }
-
-    res.render('dashboard', { user });
-  } catch (error) {
-    console.error('Error loading dashboard:', error);
-    res.status(500).send('Internal server error.');
-  }
-});
 
 // Basic navigation views
 app.get('/', (req, res) => res.render('index'));

@@ -1,3 +1,6 @@
+import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
+import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
+
 const Payment = sequelize.define('Payment', {
   paymentID: {
     type: DataTypes.INTEGER,
@@ -31,3 +34,5 @@ const Payment = sequelize.define('Payment', {
     allowNull: true, // Optional but useful for reconciliation
   },
 });
+
+export default Payment;

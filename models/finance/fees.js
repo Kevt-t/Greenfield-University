@@ -1,3 +1,6 @@
+import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
+import sequelize from '../config/db.js'; // Import the sequelize instance configured for the database
+
 const Fee = sequelize.define('Fee', {
   feeID: {
     type: DataTypes.INTEGER,
@@ -27,3 +30,5 @@ const Fee = sequelize.define('Fee', {
     defaultValue: 'Pending',
   },
 });
+
+export default Fee;
