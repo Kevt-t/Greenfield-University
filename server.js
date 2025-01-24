@@ -2,11 +2,8 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sequelize from './config/db.js'; // Import database connection
-import authRoutes from './routes/authRoutes.js';
-import transactionRoutes from './routes/transactionRoutes.js';
-import authenticateToken from './middleware/authMiddleware.js';
-import { User, Transaction } from './models/associations.js'; // Ensure associations are set up
+import {} from './models/associations.js'
+import sequelize from './config/database.js'; // Import database connection
 
 // Setup __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -27,10 +24,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Static files setup
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app
-app.use('/auth', authRoutes);
-app.use('/transactions', transactionRoutes);
+
 
 
 // Basic navigation views
@@ -40,7 +34,6 @@ app.get('/login', (req, res) => res.render('login'));
 
 // Start our server
 app.listen(PORT, () => { // port is passed here
-  
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log() // blank log to make console out more readable
 });

@@ -1,11 +1,12 @@
 {
+  "type":"module",
   "name": "greenfield-university",
   "version": "1.0.0",
   "description": "Greenfield University works to replace an outdated paper-based system for registering students.",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
