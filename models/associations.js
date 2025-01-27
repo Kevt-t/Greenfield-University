@@ -13,7 +13,9 @@ from './index.js';
 // Students
 Student.belongsTo(Major, { foreignKey: 'majorID', as: 'major' });
 Student.belongsTo(Minor, { foreignKey: 'minorID', as: 'minor' });
+
 Student.belongsToMany(Course, { through: Enrollment, foreignKey: 'studentID', as: 'courses' });
+
 Student.hasMany(Fee, { foreignKey: 'studentID', as: 'fees' });
 Student.hasMany(Payment, { foreignKey: 'studentID', as: 'payments' });
 

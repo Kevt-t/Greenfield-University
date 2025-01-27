@@ -17,4 +17,3 @@ export { default as Instructor } from './courses/instructors.js';
 export { default as Enrollment } from './courses/enrollment.js';
 export { default as Fee } from './finance/fees.js';
 export { default as Payment } from './finance/payments.js';
-

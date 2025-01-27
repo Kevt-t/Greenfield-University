@@ -1,5 +1,9 @@
 import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
-import sequelize from '../config/database.js'; // Import the sequelize instance configured for the database
+import sequelize from '../../config/database.js'; // Import the sequelize instance configured for the database
+import Major from './majors.js';
+import Minor from './minors.js';
+import Instructor from '../courses/instructors.js';
+import {} from '../associations.js';
 import bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 
 const Student = sequelize.define('Student', {

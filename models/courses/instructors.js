@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
-import sequelize from '../config/database.js'; // Import the sequelize instance configured for the database
+import sequelize from '../../config/database.js'; // Import the sequelize instance configured for the database
 
 const Instructor = sequelize.define('Instructor', {
     instructorID: {

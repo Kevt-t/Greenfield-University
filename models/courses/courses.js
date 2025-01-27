@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
-import sequelize from '../config/database.js'; // Import the sequelize instance configured for the database
+import sequelize from '../../config/database.js'; // Import the sequelize instance configured for the database
+import Instructor from './instructors.js'; // Get da teachers
 
 const Course = sequelize.define('Course', {
     courseID: {
