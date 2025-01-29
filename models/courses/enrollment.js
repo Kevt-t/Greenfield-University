@@ -11,10 +11,14 @@ const Enrollment = sequelize.define('Enrollment', {
   studentID: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    references: { model: 'Students', key: 'studentID' },
+    onDelete: 'CASCADE',
   },
   courseID: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    references: { model: 'Courses', key: 'courseID' },
+    onDelete: 'CASCADE',
   },
   enrollmentDate: {
     type: DataTypes.DATEONLY,

@@ -60,7 +60,7 @@ const seedDatabase = async () => {
 
     // ✅ Seed students
     const students = await Student.bulkCreate([
-      { firstName: 'Alice', lastName: 'Johnson', DOB: '2000-05-15', gender: 'Female', email: 'alice@example.com', phoneNumber: '1234567890', address: '123 Main St', majorID: majors[0].majorID, enrollmentDate: '2023-01-15' },
+      { firstName: 'Alice', lastName: 'Johnson', DOB: '2000-05-15', gender: 'Female', email: '7457492@philasd.org', phoneNumber: '1234567890', address: '123 Main St', majorID: majors[0].majorID, enrollmentDate: '2023-01-15' },
       { firstName: 'Bob', lastName: 'Williams', DOB: '1999-10-20', gender: 'Male', email: 'bob@example.com', phoneNumber: '0987654321', address: '456 Elm St', majorID: majors[1].majorID, minorID: minors[0].minorID, enrollmentDate: '2023-01-15' },
     ], { returning: true });
 

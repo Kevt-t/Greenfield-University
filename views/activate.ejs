@@ -9,6 +9,10 @@
 <body>
   <div class="container text-center mt-5">
     <h2>Activate Your Account</h2>
+    <form action="/activate/send" method="POST">
+      <input type="email" name="email" class="form-control mt-3" placeholder="Enter your email" required>
+      <button type="submit" class="btn btn-primary mt-3">Send Activation Email</button>
+    </form>
   </div>
 </body>
 </html>

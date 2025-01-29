@@ -8,7 +8,7 @@ const Student = sequelize.define('Student', {
     primaryKey: true,
     allowNull: false,
   },
-
+ 
   firstName: { 
     type: DataTypes.STRING, 
     allowNull: false 
@@ -31,7 +31,7 @@ const Student = sequelize.define('Student', {
 
   email: { 
     type: DataTypes.STRING, 
-    allowNull: false,
+    allowNull: false, 
     unique: true, validate: { isEmail: true } 
   },
 
@@ -72,6 +72,12 @@ const Student = sequelize.define('Student', {
     type: DataTypes.BOOLEAN, 
     defaultValue: false 
   },
+    
+  activationToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  
 });
-
+ 
 export default Student;
