@@ -1,7 +1,5 @@
-import { DataTypes } from 'sequelize'; // Import DataTypes from sequelize for defining model attributes
-import sequelize from '../../config/database.js'; // Import the sequelize instance configured for the database
-import Student from '../student/students.js';
-import Fee from './fees.js';
+import { DataTypes } from 'sequelize';
+import sequelize from '../../config/database.js';
 
 const Payment = sequelize.define('Payment', {
   paymentID: {
@@ -11,12 +9,10 @@ const Payment = sequelize.define('Payment', {
   },
   feeID: {
     type: DataTypes.INTEGER,
-    references: { model: Fee, key: 'feeID' },
     allowNull: false,
   },
   studentID: { 
     type: DataTypes.INTEGER, 
-    references: { model: Student, key: 'studentID' },
     allowNull: false,
   },
   paymentDate: {

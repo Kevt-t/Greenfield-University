@@ -1,116 +1,108 @@
-import sequelize from './config/database.js'; // Import the Sequelize instance
-import Student from './models/students.js';
-import Major from './models/majors.js';
-import Minor from './models/minors.js';
-import Course from './models/courses.js';
-import Instructor from './models/instructors.js';
-import Enrollment from './models/enrollment.js';
+import sequelize from './config/database.js'; // Your configured Sequelize instance
+import setupAssociations from './models/associations.js'; // Import the associations setup function
+import {
+  Student,
+  Major,
+  Minor,
+  Course,
+  Instructor,
+  Fee,
+  Payment,
+  Enrollment
+} from './models/index.js'; // Import models
 
 const seedDatabase = async () => {
   try {
-    // Sync database (optional: set force: true to drop tables and recreate them)
+    console.log('🔄 Connecting to database...');
+
+    // Set up associations before syncing
+    setupAssociations();
+
+    // Sync database: Recreate all tables and ensure associations are applied
     await sequelize.sync({ force: true });
+    console.log('✅ Database synced successfully.');
 
-    console.log('Database synced successfully.');
-
-    // Seed Majors
+    // ✅ Seed majors
     const majors = await Major.bulkCreate([
-      { majorName: 'Computer Science', type: 'Bachelors', description: 'Focus on software and hardware systems.', duration: 4 },
-      { majorName: 'Business Administration', type: 'Masters', description: 'Focus on business and management principles.', duration: 2 },
-      { majorName: 'Mechanical Engineering', type: 'Bachelors', description: 'Focus on mechanical systems and design.', duration: 4 },
-    ]);
+      { majorName: 'Computer Science', type: 'Bachelors', description: 'Study of computers and algorithms.', duration: 4 },
+      { majorName: 'Business Administration', type: 'Masters', description: 'Focus on business management.', duration: 2 },
+      { majorName: 'Mechanical Engineering', type: 'Bachelors', description: 'Study of mechanical systems and design.', duration: 4 },
+      { majorName: 'Psychology', type: 'Bachelors', description: 'Study of human behavior and mental processes.', duration: 4 },
+      { majorName: 'Biology', type: 'Bachelors', description: 'Study of living organisms and ecosystems.', duration: 4 },
+    ], { returning: true });
 
-    console.log('Majors seeded.');
+    console.log(`✅ Seeded ${majors.length} majors.`);
 
-    // Seed Minors
+    // ✅ Seed minors
     const minors = await Minor.bulkCreate([
-      { minorName: 'Mathematics', description: 'Focus on mathematical principles.', duration: 2 },
-      { minorName: 'Data Science', description: 'Focus on data analysis and machine learning.', duration: 2 },
-      { minorName: 'Psychology', description: 'Focus on human behavior and mental processes.', duration: 2 },
-    ]);
+      { minorName: 'Mathematics', description: 'Study of numbers and formulas.', duration: 2 },
+      { minorName: 'Philosophy', description: 'Study of fundamental questions of existence.', duration: 2 },
+      { minorName: 'Psychology', description: 'Study of human behavior and mental processes.', duration: 2 },
+    ], { returning: true });
 
-    console.log('Minors seeded.');
+    console.log(`✅ Seeded ${minors.length} minors.`);
 
-    // Seed Instructors
+    // ✅ Seed instructors
     const instructors = await Instructor.bulkCreate([
-      { firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@university.edu', phoneNumber: '+1234567890', department: 'Computer Science' },
-      { firstName: 'Bob', lastName: 'Johnson', email: 'bob.johnson@university.edu', phoneNumber: '+1234567891', department: 'Business Administration' },
-      { firstName: 'Charlie', lastName: 'Brown', email: 'charlie.brown@university.edu', phoneNumber: '+1234567892', department: 'Mechanical Engineering' },
-    ]);
+      { firstName: 'John', lastName: 'Doe', email: 'jdoe@example.com', phoneNumber: '+123456789', department: 'Computer Science' },
+      { firstName: 'Jane', lastName: 'Smith', email: 'jsmith@example.com', phoneNumber: '+987654321', department: 'Business' },
+    ], { returning: true });
 
-    console.log('Instructors seeded.');
+    console.log(`✅ Seeded ${instructors.length} instructors.`);
 
-    // Seed Courses
+    // ✅ Seed courses
     const courses = await Course.bulkCreate([
-      { courseName: 'Introduction to Programming', description: 'Learn the basics of programming.', credits: 3, schedule: 'Mon-Wed-Fri 10:00-11:00', instructorID: instructors[0].instructorID },
-      { courseName: 'Machine Learning', description: 'Introduction to machine learning concepts.', credits: 4, schedule: 'Tue-Thu 14:00-15:30', instructorID: instructors[0].instructorID },
-      { courseName: 'Business Strategy', description: 'Learn strategic planning and execution.', credits: 3, schedule: 'Mon-Wed 12:00-13:30', instructorID: instructors[1].instructorID },
-      { courseName: 'Thermodynamics', description: 'Understand heat and energy systems.', credits: 3, schedule: 'Fri 14:00-16:00', instructorID: instructors[2].instructorID },
-    ]);
+      { courseName: 'Introduction to Programming', description: 'Learn the basics of programming.', credits: 3, schedule: 'Mon 10:00-12:00', instructorID: instructors[0].instructorID },
+      { courseName: 'Marketing 101', description: 'Introduction to marketing principles.', credits: 3, schedule: 'Wed 14:00-16:00', instructorID: instructors[1].instructorID },
+    ], { returning: true });
 
-    console.log('Courses seeded.');
+    console.log(`✅ Seeded ${courses.length} courses.`);
 
-    // Seed Students
+    // ✅ Seed students
     const students = await Student.bulkCreate([
-      {
-        firstName: 'John',
-        lastName: 'Doe',
-        DOB: '2000-01-01',
-        gender: 'Male',
-        email: 'john.doe@example.com',
-        phoneNumber: '1234567890',
-        address: '123 Main Street',
-        enrollmentDate: '2022-09-01',
-        status: 'Active',
-        majorID: majors[0].majorID,
-        minorID: minors[0].minorID,
-      },
-      {
-        firstName: 'Jane',
-        lastName: 'Smith',
-        DOB: '2001-05-15',
-        gender: 'Female',
-        email: 'jane.smith@example.com',
-        phoneNumber: '9876543210',
-        address: '456 Elm Street',
-        enrollmentDate: '2021-09-01',
-        status: 'Active',
-        majorID: majors[1].majorID,
-        minorID: minors[1].minorID,
-      },
-      {
-        firstName: 'Emma',
-        lastName: 'Johnson',
-        DOB: '1999-08-22',
-        gender: 'Female',
-        email: 'emma.johnson@example.com',
-        phoneNumber: '1122334455',
-        address: '789 Oak Street',
-        enrollmentDate: '2020-09-01',
-        status: 'Graduated',
-        majorID: majors[2].majorID,
-        minorID: null,
-      },
-    ]);
+      { firstName: 'Alice', lastName: 'Johnson', DOB: '2000-05-15', gender: 'Female', email: 'alice@example.com', phoneNumber: '1234567890', address: '123 Main St', majorID: majors[0].majorID, enrollmentDate: '2023-01-15' },
+      { firstName: 'Bob', lastName: 'Williams', DOB: '1999-10-20', gender: 'Male', email: 'bob@example.com', phoneNumber: '0987654321', address: '456 Elm St', majorID: majors[1].majorID, minorID: minors[0].minorID, enrollmentDate: '2023-01-15' },
+    ], { returning: true });
 
-    console.log('Students seeded.');
+    if (!students.length) {
+      throw new Error("❌ No students were inserted! Check seeding process.");
+    }
 
-    // Seed Enrollments
-    await Enrollment.bulkCreate([
-      { studentID: students[0].studentID, courseID: courses[0].courseID, enrollmentDate: '2022-09-05', grade: 90 },
-      { studentID: students[0].studentID, courseID: courses[1].courseID, enrollmentDate: '2022-09-06', grade: 85 },
-      { studentID: students[1].studentID, courseID: courses[2].courseID, enrollmentDate: '2021-09-07', grade: 88 },
-      { studentID: students[2].studentID, courseID: courses[3].courseID, enrollmentDate: '2020-09-08', grade: 92 },
-    ]);
+    console.log(`✅ Seeded ${students.length} students.`);
 
-    console.log('Enrollments seeded.');
+    // ✅ Seed enrollments
+    const enrollments = await Enrollment.bulkCreate([
+      { studentID: students[0].studentID, courseID: courses[0].courseID, enrollmentDate: '2023-01-16', grade: 90 },
+      { studentID: students[1].studentID, courseID: courses[1].courseID, enrollmentDate: '2023-01-16', grade: 85 },
+    ], { returning: true });
 
-    console.log('Database seeding completed successfully.');
+    console.log(`✅ Seeded ${enrollments.length} enrollments.`);
+
+    // ✅ Seed fees
+    const fees = await Fee.bulkCreate([
+      { studentID: students[0].studentID, amount: 5000, description: 'Tuition Fee', dueDate: '2023-02-01', status: 'Pending' },
+      { studentID: students[1].studentID, amount: 7000, description: 'Tuition Fee', dueDate: '2023-02-01', status: 'Pending' },
+    ], { returning: true });
+
+    console.log(`✅ Seeded ${fees.length} fees.`);
+
+    // ✅ Seed payments
+    const payments = await Payment.bulkCreate([
+      { feeID: fees[0].feeID, studentID: students[0].studentID, paymentDate: '2023-01-20', amount: 5000, method: 'Credit Card', referenceNumber: 'REF12345' },
+      { feeID: fees[1].feeID, studentID: students[1].studentID, paymentDate: '2023-01-25', amount: 7000, method: 'Bank Transfer', referenceNumber: 'REF67890' },
+    ], { returning: true });
+
+    console.log(`✅ Seeded ${payments.length} payments.`);
+
+    console.log('🎉 Database successfully seeded with sample data!');
+
   } catch (error) {
-    console.error('Error while seeding the database:', error);
+    console.error('❌ Error seeding database:', error);
   } finally {
-    await sequelize.close(); // Close the connection after seeding
+    await sequelize.close();
+    console.log('🔴 Database connection closed.');
   }
 };
 
+// Run the seeding process
 seedDatabase();
