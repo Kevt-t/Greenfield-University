@@ -8,31 +8,70 @@ const Student = sequelize.define('Student', {
     primaryKey: true,
     allowNull: false,
   },
-  firstName: { type: DataTypes.STRING, allowNull: false },
-  lastName: { type: DataTypes.STRING, allowNull: false },
-  DOB: { type: DataTypes.DATEONLY, allowNull: false },
-  gender: { type: DataTypes.ENUM('Male', 'Female', 'Non-Binary', 'Other'), allowNull: false },
-  email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
-  phoneNumber: { type: DataTypes.STRING, allowNull: true, validate: { is: /^[0-9]+$/ } },
-  address: { type: DataTypes.TEXT, allowNull: true },
-  enrollmentDate: { type: DataTypes.DATEONLY, allowNull: false, defaultValue: DataTypes.NOW },
-  status: { type: DataTypes.ENUM('Active', 'Graduated', 'Withdrawn', 'Banned'), allowNull: false, defaultValue: 'Active' },
+
+  firstName: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  },
+
+  lastName: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  },
+
+  DOB: { 
+    type: DataTypes.DATEONLY, 
+    allowNull: false 
+  },
+
+  gender: { 
+    type: DataTypes.ENUM('Male', 'Female', 'Non-Binary', 'Other'), 
+    allowNull: false
+  },
+
+  email: { 
+    type: DataTypes.STRING, 
+    allowNull: false,
+    unique: true, validate: { isEmail: true } 
+  },
+
+  phoneNumber: { 
+    type: DataTypes.STRING, 
+    allowNull: true, 
+    validate: { is: /^[0-9]+$/ } 
+  },
   
+  address: { 
+    type: DataTypes.TEXT, 
+    allowNull: true 
+  },
+  
+  enrollmentDate: {
+    type: DataTypes.DATEONLY, 
+    allowNull: false, 
+    defaultValue: DataTypes.NOW 
+  },
+
+  status: { 
+    type: DataTypes.ENUM('Active', 'Graduated', 'Withdrawn', 'Banned'), 
+    allowNull: false, 
+    defaultValue: 'Active' 
+  },
+
   majorID: { 
     type: DataTypes.INTEGER, 
-    allowNull: false,
-    references: { model: 'Majors', key: 'majorID' }, 
-    onDelete: 'CASCADE',
+    allowNull: false 
   },
-  
-  minorID: { 
-    type: DataTypes.INTEGER, 
-    allowNull: true,
-    references: { model: 'Minors', key: 'minorID' }, 
-    onDelete: 'SET NULL',
+
+  minorID: {
+    type: DataTypes.INTEGER,
+    allowNull: true 
   },
-  
-  isAccountActive: { type: DataTypes.BOOLEAN, defaultValue: false },
+
+  isAccountActive: { 
+    type: DataTypes.BOOLEAN, 
+    defaultValue: false 
+  },
 });
 
 export default Student;
