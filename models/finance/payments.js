@@ -10,9 +10,11 @@ const Payment = sequelize.define('Payment', {
   feeID: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    references: { model: 'Fees', key: 'feeID' },
   },
-  studentID: { 
-    type: DataTypes.INTEGER, 
+  studentID: {
+    type: DataTypes.INTEGER,
+    references: { model: 'Students', key: 'studentID' },
     allowNull: false,
   },
   paymentDate: {

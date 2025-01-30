@@ -10,7 +10,6 @@ const Fee = sequelize.define('Fee', {
   studentID: {
     type: DataTypes.INTEGER,
     references: { model: 'Students', key: 'studentID' },
-    onDelete: 'CASCADE',
     allowNull: false,
   },
   amount: {

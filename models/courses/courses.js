@@ -35,7 +35,6 @@
       type: DataTypes.INTEGER, 
       allowNull: false,
       references: { model: 'Instructors', key: 'instructorID' }, 
-      onDelete: 'CASCADE',
     },  
   }, {
     timestamps: true,

@@ -9,33 +9,47 @@ import Fee from './finance/fees.js';
 import Payment from './finance/payments.js';
 
 const setupAssociations = () => {
-  const { Student, Major, Minor, Course, Instructor, Enrollment, Fee, Payment } = sequelize.models;
-
-  // ✅ First create independent tables
+  /** ========================
+   *  Majors and Minors Association
+   *  ========================= */
   Major.hasMany(Student, { foreignKey: 'majorID', as: 'students' });
-  Minor.hasMany(Student, { foreignKey: 'minorID', as: 'students' });
-
   Student.belongsTo(Major, { foreignKey: 'majorID', as: 'major' });
+
+  Minor.hasMany(Student, { foreignKey: 'minorID', as: 'students' });
   Student.belongsTo(Minor, { foreignKey: 'minorID', as: 'minor' });
 
-  // ✅ Instructor before Course
+  /** ========================
+   *  Instructor and Courses Association
+   *  ========================= */
   Instructor.hasMany(Course, { foreignKey: 'instructorID', as: 'courses' });
   Course.belongsTo(Instructor, { foreignKey: 'instructorID', as: 'instructor' });
 
-  // ✅ Course before Enrollment
-  Course.belongsToMany(Student, { through: Enrollment, foreignKey: 'courseID', as: 'students' });
+  /** ========================
+   *  Many-to-Many: Students & Courses via Enrollment
+   *  ========================= */
   Student.belongsToMany(Course, { through: Enrollment, foreignKey: 'studentID', as: 'courses' });
+  Course.belongsToMany(Student, { through: Enrollment, foreignKey: 'courseID', as: 'students' });
 
-  // ✅ Now link Enrollments
+  // Ensure enrollment has direct links to Student and Course
   Enrollment.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
   Enrollment.belongsTo(Course, { foreignKey: 'courseID', as: 'course' });
 
-  // ✅ Fees and Payments must come last
-  Fee.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
-  Fee.hasMany(Payment, { foreignKey: 'feeID', as: 'payments' });
-  Payment.belongsTo(Fee, { foreignKey: 'feeID', as: 'fee' });
-  Payment.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
-};
+  Student.hasMany(Enrollment, { foreignKey: 'studentID', as: 'enrollments' });
+  Course.hasMany(Enrollment, { foreignKey: 'courseID', as: 'enrollments' });
 
+  /** ========================
+   *  Fees and Payments Association
+   *  ========================= */
+  Fee.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
+  Student.hasMany(Fee, { foreignKey: 'studentID', as: 'fees' });
+
+  Payment.belongsTo(Fee, { foreignKey: 'feeID', as: 'fee' });
+  Fee.hasMany(Payment, { foreignKey: 'feeID', as: 'payments' });
+
+  Payment.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
+  Student.hasMany(Payment, { foreignKey: 'studentID', as: 'payments' });
+
+  console.log('✅ Associations have been set up successfully!');
+};
 
 export default setupAssociations;

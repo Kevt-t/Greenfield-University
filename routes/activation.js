@@ -2,6 +2,7 @@ import express from "express";
 import Student from "../models/student/students.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -23,9 +24,16 @@ router.post("/send", async (req, res) => {
       return res.send("Your account is already activated.");
     }
 
-    // Generate Token
+    // Generate Activation Token
     const token = crypto.randomBytes(32).toString("hex");
     student.activationToken = token;
+
+    // Generate Temporary Password
+    const tempPassword = crypto.randomBytes(5).toString("hex"); // Example: "a3f21d8b"
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    student.password = hashedPassword; // Store hashed password
+    student.isTemporaryPassword = true; // Mark as temporary
+
     await student.save();
 
     // Email Transporter
@@ -44,12 +52,16 @@ router.post("/send", async (req, res) => {
       from: process.env.EMAIL_USER,
       to: student.email,
       subject: "Activate Your Greenfield University Account",
-      html: `<h3>Click the link below to activate your account:</h3>
-      <a href="${activationLink}">Activate Account</a>
-      <p>This link expires in 24 hours.</p>`,
+      html: `
+        <h3>Click the link below to activate your account:</h3>
+        <a href="${activationLink}">Activate Account</a>
+        <p>Use this temporary password to log in after activation: <b>${tempPassword}</b></p>
+        <p>You will be required to set a new password on first login.</p>
+        <p>This link expires in 24 hours.</p>
+      `,
     };
 
-    // Send Email with Debugging
+    // Send Email
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.error("Error sending email:", err);
@@ -64,19 +76,16 @@ router.post("/send", async (req, res) => {
   }
 });
 
-// 📌 Activate Account
 router.get("/:token", async (req, res) => {
   const { token } = req.params;
 
   try {
     const student = await Student.findOne({ where: { activationToken: token } });
 
-    if (!student) {
-      return res.status(400).send("Invalid or expired activation link.");
-    }
+    if (!student) return res.status(400).send("Invalid or expired activation link.");
 
     student.isAccountActive = true;
-    student.activationToken = null; // Remove token after activation
+    student.activationToken = null; 
     await student.save();
 
     res.render("activated", { name: student.firstName });
@@ -85,5 +94,6 @@ router.get("/:token", async (req, res) => {
     res.status(500).send("Error activating account.");
   }
 });
+
 
 export default router;

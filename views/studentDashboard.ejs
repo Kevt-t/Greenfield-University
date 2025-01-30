@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Link your CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Welcome, <%= student.firstName %> <%= student.lastName %>!</h1>
+        <p>Email: <%= student.email %></p>
+        <p>Status: <%= student.status %></p>
+    </header>
+
+    <section>
+        <h2>Your Enrolled Courses</h2>
+        <% if (courses.length > 0) { %>
+            <ul>
+                <% courses.forEach(course => { %>
+                    <li><strong><%= course.courseName %></strong> - <%= course.schedule %></li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>You are not enrolled in any courses.</p>
+        <% } %>
+    </section>
+
+    <section>
+        <h2>Your Fees</h2>
+        <% if (fees.length > 0) { %>
+            <table border="1">
+                <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                </tr>
+                <% fees.forEach(fee => { %>
+                    <tr>
+                        <td><%= fee.description %></td>
+                        <td>$<%= fee.amount.toFixed(2) %></td>
+                        <td><%= fee.status %></td>
+                        <td><%= fee.dueDate %></td>
+                    </tr>
+                <% }); %>
+            </table>
+        <% } else { %>
+            <p>No outstanding fees.</p>
+        <% } %>
+    </section>
+
+    <section>
+        <h2>Your Payments</h2>
+        <% if (payments.length > 0) { %>
+            <table border="1">
+                <tr>
+                    <th>Payment Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                </tr>
+                <% payments.forEach(payment => { %>
+                    <tr>
+                        <td><%= payment.paymentDate %></td>
+                        <td>$<%= payment.amount.toFixed(2) %></td>
+                        <td><%= payment.method %></td>
+                        <td><%= payment.referenceNumber || 'N/A' %></td>
+                    </tr>
+                <% }); %>
+            </table>
+        <% } else { %>
+            <p>No payments recorded.</p>
+        <% } %>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Greenfield University</p>
+    </footer>
+</body>
+</html>
