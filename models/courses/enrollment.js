@@ -17,7 +17,7 @@ const Enrollment = sequelize.define('Enrollment', {
   courseID: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: { model: 'Courses', key: 'courseID' },
+    references: { model: 'Course', key: 'courseID' },
     onDelete: 'CASCADE',
   },
   enrollmentDate: {

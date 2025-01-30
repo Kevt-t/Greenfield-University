@@ -1,0 +1,34 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+.logo {
+    max-width: 350px;
+    margin: 5px auto;
+    display: block;
+}
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+.btn {
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+body {
+    background-image: url('/assets/test4.jpg'); /* Replace with the actual path */
+    background-size: cover; /* Ensures the image covers the entire background */
+    background-position: center; /* Centers the background image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-attachment: fixed; /* Keeps the background fixed while scrolling */
+    font-family: Arial, sans-serif;
+}
+
+h1, p.text-muted {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Adds contrast to text */
+}
