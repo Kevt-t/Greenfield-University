@@ -7,32 +7,51 @@ const Payment = sequelize.define('Payment', {
     autoIncrement: true,
     primaryKey: true,
   },
-  feeID: {
+
+    feeID: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,  // ✅ Now allows NULL when Fee is deleted
     references: { model: 'Fees', key: 'feeID' },
-  },
+    onDelete: 'SET NULL',
+},
+
+
   studentID: {
     type: DataTypes.INTEGER,
     references: { model: 'Students', key: 'studentID' },
     allowNull: false,
   },
+
   paymentDate: {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
+
   amount: {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+
   method: {
-    type: DataTypes.ENUM('Credit Card', 'Bank Transfer', 'Check'),
+    type: DataTypes.STRING,
     allowNull: false,
+    validate: { isIn: [['Credit Card', 'Bank Transfer', 'Check']] },
   },
+
   referenceNumber: {
     type: DataTypes.STRING,
-    allowNull: true, // Optional but useful for reconciliation
+    allowNull: true,
   },
+
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'Pending',
+    validate: { isIn: [['Pending', 'Failed', 'Successful']] },
+  },
+}, {
+  paranoid: true, // Enables soft delete
 });
+
 
 export default Payment;

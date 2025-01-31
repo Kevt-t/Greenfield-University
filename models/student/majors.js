@@ -40,6 +40,7 @@ const Major = sequelize.define('Major', {
   },
   {
     timestamps: false, // Majors don't usually require timestamps
+    tableName: 'Major',
   });
   
 export default Major;

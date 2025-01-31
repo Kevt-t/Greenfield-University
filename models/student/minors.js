@@ -36,6 +36,7 @@ const Minor = sequelize.define('Minor', {
   },
   {
     timestamps: false,
+    tableName: 'Minor',
   });
   
 export default Minor;

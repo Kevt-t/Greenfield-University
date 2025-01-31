@@ -8,29 +8,36 @@ const Enrollment = sequelize.define('Enrollment', {
     primaryKey: true,
     allowNull: false,
   },
+  
   studentID: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Change from false to true
     references: { model: 'Students', key: 'studentID' },
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   },
+
   courseID: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Change from false to true
     references: { model: 'Courses', key: 'courseID' },
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   },
+
   enrollmentDate: {
     type: DataTypes.DATEONLY,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+
   grade: {
     type: DataTypes.FLOAT,
     allowNull: true,
   },
+
 }, {
   timestamps: false,
+  paranoid: true, // Enables soft delete
 });
+
 
 export default Enrollment;
