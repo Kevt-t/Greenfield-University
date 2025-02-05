@@ -1,10 +1,12 @@
 import sequelize from '../config/database.js';
-import Student from './student/students.js';
 import Major from './student/majors.js';
 import Minor from './student/minors.js';
-import Course from './courses/courses.js';
+import Student from './student/students.js';
+
 import Instructor from './courses/instructors.js';
-import Enrollment from './courses/enrollment.js';
+import Course from './courses/courses.js';
+import Enrollment from './courses/enrollments.js';
+
 import Fee from './finance/fees.js';
 import Payment from './finance/payments.js';
 
@@ -27,16 +29,12 @@ const setupAssociations = () => {
   /** ========================
    *  Many-to-Many: Students & Courses via Enrollment
    *  ========================= */
-  Student.belongsToMany(Course, { through: Enrollment, foreignKey: 'studentID', as: 'courses' });
-  Course.belongsToMany(Student, { through: Enrollment, foreignKey: 'courseID', as: 'students' });
-
-  // Ensure enrollment has direct links to Student and Course
-  Enrollment.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
-  Enrollment.belongsTo(Course, { foreignKey: 'courseID', as: 'course' });
-
   Student.hasMany(Enrollment, { foreignKey: 'studentID', as: 'enrollments' });
+  Enrollment.belongsTo(Student, { foreignKey: 'studentID', as: 'student' });
+  
   Course.hasMany(Enrollment, { foreignKey: 'courseID', as: 'enrollments' });
-
+  Enrollment.belongsTo(Course, { foreignKey: 'courseID', as: 'course' });
+  
   /** ========================
    *  Fees and Payments Association
    *  ========================= */

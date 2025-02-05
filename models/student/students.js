@@ -57,14 +57,14 @@ const Student = sequelize.define('Student', {
   majorID: {
     type: DataTypes.INTEGER,
     allowNull: true, // ✅ Now allows students to exist without a major
-    references: { model: 'Major', key: 'majorID' },
+    references: { model: 'Majors', key: 'majorID' },
     onDelete: 'SET NULL',  // ✅ Keeps student record if major is deleted
     onUpdate: 'CASCADE'
   },
   minorID: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    references: { model: 'Minor', key: 'minorID' },
+    references: { model: 'Minors', key: 'minorID' },
     onDelete: 'SET NULL',  // ✅ Keeps student record if minor is deleted
     onUpdate: 'CASCADE'
   },
@@ -89,7 +89,7 @@ const Student = sequelize.define('Student', {
   }, // Enables soft delete
 }, {
   paranoid: true,
-});
+}); 
 
 // Hash password before saving
 Student.beforeCreate(async (student) => {

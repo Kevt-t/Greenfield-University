@@ -1,84 +1,86 @@
 import sequelize from './config/database.js';
-import { Major, Minor, Student, Course, Instructor, Enrollment, Fee, Payment } from './models/index.js';
-import bcrypt from 'bcrypt';
+import Student from './models/student/students.js';
+import Major from './models/student/majors.js';
+import Minor from './models/student/minors.js';
+import Instructor from './models/courses/instructors.js';
+import Course from './models/courses/courses.js';
+import Enrollment from './models/courses/enrollments.js';
+import Fee from './models/finance/fees.js';
+import Payment from './models/finance/payments.js';
 
 const seedDatabase = async () => {
   try {
-    console.log('🌱 Seeding database...');
+    console.log('🌱 Starting data seeding...');
 
-    // **Clear existing data (Optional: if using sync({ force: true }))**
-    await sequelize.sync({ force: true });
+    /** ========================
+     *  Insert Majors & Minors
+     *  ========================= */
+    const [csMajor, businessMajor] = await Major.bulkCreate([
+      { majorName: 'Computer Science', type: 'Bachelors', description: 'CS Degree', duration: 4 },
+      { majorName: 'Business Administration', type: 'Bachelors', description: 'Business Degree', duration: 4 },
+    ], { returning: true });
 
-    /** =======================
-     *  Seed Majors & Minors
-     *  ======================= */
-    const majors = await Major.bulkCreate([
-      { majorName: 'Computer Science', type: 'Bachelors', duration: 4 },
-      { majorName: 'Business Administration', type: 'Bachelors', duration: 4 },
-      { majorName: 'Mechanical Engineering', type: 'Bachelors', duration: 4 }
-    ]);
+    const [mathMinor, econMinor] = await Minor.bulkCreate([
+      { minorName: 'Mathematics', description: 'Math Minor', duration: 2 },
+      { minorName: 'Economics', description: 'Economics Minor', duration: 2 },
+    ], { returning: true });
 
-    const minors = await Minor.bulkCreate([
-      { minorName: 'Mathematics', duration: 2 },
-      { minorName: 'Psychology', duration: 2 }
-    ]);
+    /** ========================
+     *  Insert Instructors
+     *  ========================= */
+    const [johnDoe, janeDoe] = await Instructor.bulkCreate([
+      { firstName: 'Kevin', lastName: 'Tellez', email: 'kevintelleztorres@gmail.com', department: 'Computer Science', password: 'hashed_password' },
+      { firstName: 'Jane', lastName: 'Doe', email: 'janedoe@university.com', department: 'Business', password: 'hashed_password' },
+    ], { returning: true });
 
-    /** =======================
-     *  Seed Instructors
-     *  ======================= */
-    const hashedInstructorPassword = await bcrypt.hash('instructor123', 10);
-    const instructors = await Instructor.bulkCreate([
-      { firstName: 'Jose', lastName: 'Torres', email: '7457492@philasd.org', department: 'Computer Science', password: hashedInstructorPassword, isAccountActive: false },
-      { firstName: 'Bob', lastName: 'Smith', email: 'bob@university.edu', department: 'Business', password: hashedInstructorPassword, isAccountActive: false }
-    ]);
+    /** ========================
+     *  Insert Students
+     *  ========================= */
+    const [studentA, studentB] = await Student.bulkCreate([
+      { firstName: 'Kevin', lastName: 'Tellez', DOB: '2000-05-15', gender: 'Female', email: '7457492@philasd.org', majorID: csMajor.majorID, minorID: mathMinor.minorID, password: 'hashed_password' },
+      { firstName: 'Bob', lastName: 'Johnson', DOB: '1999-08-22', gender: 'Male', email: 'bob@uni.com', majorID: businessMajor.majorID, minorID: econMinor.minorID, password: 'hashed_password' },
+    ], { returning: true });
 
-    /** =======================
-     *  Seed Courses
-     *  ======================= */
-    const courses = await Course.bulkCreate([
-      { courseName: 'Introduction to Programming', description: 'Learn the basics of programming.', credits: 3, schedule: 'MWF 9:00-10:30', instructorID: instructors[0].instructorID },
-      { courseName: 'Marketing Strategies', description: 'Fundamentals of marketing.', credits: 3, schedule: 'TTh 11:00-12:30', instructorID: instructors[1].instructorID }
-    ]);
+    /** ========================
+     *  Insert Courses
+     *  ========================= */
+    const [cs101, bus201] = await Course.bulkCreate([
+      { courseName: 'Intro to Programming', description: 'Learn the basics of programming.', credits: 3, schedule: 'MWF 10:00-11:30 AM', instructorID: johnDoe.instructorID },
+      { courseName: 'Business Management', description: 'Fundamentals of business management.', credits: 3, schedule: 'TTh 2:00-3:30 PM', instructorID: janeDoe.instructorID },
+    ], { returning: true });
 
-    /** =======================
-     *  Seed Students
-     *  ======================= */
-    const hashedStudentPassword = await bcrypt.hash('student123', 10);
-    const students = await Student.bulkCreate([
-      { firstName: 'Kevin', lastName: 'Tellez-Torres', email: 'kevintelleztorres@gmail.com', DOB: '2000-05-15', gender: 'Male', majorID: majors[0].majorID, minorID: minors[0].minorID, password: hashedStudentPassword, isAccountActive: false },
-      { firstName: 'Emily', lastName: 'Clark', email: 'emily.clark@example.com', DOB: '2001-07-22', gender: 'Female', majorID: majors[1].majorID, minorID: minors[1].minorID, password: hashedStudentPassword, isAccountActive: false }
-    ]);
-
-    /** =======================
-     *  Seed Enrollments
-     *  ======================= */
+    /** ========================
+     *  Insert Enrollments
+     *  ========================= */
     await Enrollment.bulkCreate([
-      { studentID: students[0].studentID, courseID: courses[0].courseID },
-      { studentID: students[1].studentID, courseID: courses[1].courseID }
+      { studentID: studentA.studentID, courseID: cs101.courseID, status: 'Enrolled' },
+      { studentID: studentB.studentID, courseID: bus201.courseID, status: 'Enrolled' },
     ]);
 
-    /** =======================
-     *  Seed Fees
-     *  ======================= */
-    const fees = await Fee.bulkCreate([
-      { studentID: students[0].studentID, amount: 5000, description: 'Tuition Fee', dueDate: '2025-01-10', status: 'Pending' },
-      { studentID: students[1].studentID, amount: 4800, description: 'Tuition Fee', dueDate: '2025-01-10', status: 'Paid' }
-    ]);
+    /** ========================
+     *  Insert Fees
+     *  ========================= */
+    const [feeA, feeB] = await Fee.bulkCreate([
+      { studentID: studentA.studentID, amount: 1000, dueDate: '2025-01-15', status: 'Pending' },
+      { studentID: studentB.studentID, amount: 1200, dueDate: '2025-02-01', status: 'Overdue' },
+    ], { returning: true });
 
-    /** =======================
-     *  Seed Payments
-     *  ======================= */
+    /** ========================
+     *  Insert Payments
+     *  ========================= */
     await Payment.bulkCreate([
-      { feeID: fees[1].feeID, studentID: students[1].studentID, amount: 4800, paymentDate: '2025-01-05', method: 'Credit Card', status: 'Successful' }
+      { feeID: feeA.feeID, studentID: studentA.studentID, paymentDate: '2025-01-10', amount: 500, method: 'Credit Card', status: 'Successful' },
+      { feeID: feeB.feeID, studentID: studentB.studentID, paymentDate: '2025-02-05', amount: 1200, method: 'Bank Transfer', status: 'Successful' },
     ]);
 
-    console.log('✅ Database successfully seeded!');
-    process.exit(0);
+    console.log('✅ Seeding completed successfully!');
   } catch (error) {
     console.error('❌ Error seeding database:', error);
-    process.exit(1);
+  } finally {
+    await sequelize.close();
+    console.log('🔄 Database connection closed.');
   }
 };
 
-// Run seed script
+// Run the seed function
 seedDatabase();

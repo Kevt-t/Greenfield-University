@@ -44,11 +44,10 @@ const Payment = sequelize.define('Payment', {
   },
 
   status: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('Pending', 'Failed', 'Successful'), // ✅ Use ENUM instead of STRING + validation
     allowNull: false,
     defaultValue: 'Pending',
-    validate: { isIn: [['Pending', 'Failed', 'Successful']] },
-  },
+  },  
 }, {
   paranoid: true, // Enables soft delete
 });
