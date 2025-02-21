@@ -3,6 +3,9 @@ import path from "path";
 import dotenv from "dotenv";
 import session from "express-session";
 import sequelize from "./config/database.js";
+import resetPasswordRoutes from "./routes/resetPassword.js";
+import authLoginRoutes from "./routes/authLogin.js";
+import dashboardRoutes from "./routes/dashboard.js";
 import './models/index.js';  // This ensures models & associations are set before server starts
 import setupAssociations from './models/associations.js';
 
@@ -26,12 +29,16 @@ app.use(express.static("public"));
 
 //Routes
 app.use('/auth', authRoutes);
+app.use('/auth', authLoginRoutes);
+app.use("/", dashboardRoutes);
+app.use("/", resetPasswordRoutes);
 
 
 // Render views for basic navigation
 app.get('/', (req, res) => res.render('index'));
 app.get('/activate', (req, res) => res.render('activate'));
 app.get('/login', (req, res) => res.render('login')); //login portal for student and instructor
+app.get('/activation-success', (req, res) => res.render('activation-success')); //login portal for student and instructor
 
 // Start Server
 const PORT = process.env.PORT || 3000;

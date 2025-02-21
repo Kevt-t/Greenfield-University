@@ -26,19 +26,53 @@ const seedDatabase = async () => {
     ], { returning: true });
 
     /** ========================
-     *  Insert Instructors
+     *  Insert Instructors (No Password Initially)
      *  ========================= */
     const [johnDoe, janeDoe] = await Instructor.bulkCreate([
-      { firstName: 'Kevin', lastName: 'Tellez', email: 'kevintelleztorres@gmail.com', department: 'Computer Science', password: 'hashed_password' },
-      { firstName: 'Jane', lastName: 'Doe', email: 'janedoe@university.com', department: 'Business', password: 'hashed_password' },
+      { 
+        firstName: 'Kevin', 
+        lastName: 'Tellez', 
+        email: 'kevintelleztorres@gmail.com', 
+        department: 'Computer Science', 
+        password: null, // No password initially
+        requiresPasswordReset: true, // Force reset after first login
+      },
+      { 
+        firstName: 'Jane', 
+        lastName: 'Doe', 
+        email: 'janedoe@university.com', 
+        department: 'Business', 
+        password: null, 
+        requiresPasswordReset: true, 
+      },
     ], { returning: true });
 
     /** ========================
-     *  Insert Students
+     *  Insert Students (No Password Initially)
      *  ========================= */
     const [studentA, studentB] = await Student.bulkCreate([
-      { firstName: 'Kevin', lastName: 'Tellez', DOB: '2000-05-15', gender: 'Female', email: '7457492@philasd.org', majorID: csMajor.majorID, minorID: mathMinor.minorID, password: 'hashed_password' },
-      { firstName: 'Bob', lastName: 'Johnson', DOB: '1999-08-22', gender: 'Male', email: 'bob@uni.com', majorID: businessMajor.majorID, minorID: econMinor.minorID, password: 'hashed_password' },
+      { 
+        firstName: 'Kevin', 
+        lastName: 'Tellez', 
+        DOB: '2000-05-15', 
+        gender: 'Female', 
+        email: '7457492@philasd.org', 
+        majorID: csMajor.majorID, 
+        minorID: mathMinor.minorID, 
+        password: null, // No password initially
+        requiresPasswordReset: true, // Force reset after first login
+      },
+      { 
+        firstName: 'Bob', 
+        lastName: 'Johnson', 
+        DOB: '1999-08-22', 
+        gender: 'Male', 
+        email: 'bob@uni.com', 
+        majorID: businessMajor.majorID, 
+        minorID: econMinor.minorID, 
+        password: null, 
+        requiresPasswordReset: true, 
+      },
     ], { returning: true });
 
     /** ========================

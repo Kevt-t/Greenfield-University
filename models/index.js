@@ -13,18 +13,24 @@ import Payment from './finance/payments.js';
 // Import and Apply Associations
 import setupAssociations from './associations.js';
 
-// ✅ Set up associations BEFORE syncing
+// Set up associations BEFORE syncing
 setupAssociations();
 
-// ✅ Synchronize database (using force: true)
-const syncDatabase = async () => {
+// Synchronize database (using force: true)
+const syncDatabase = async (force = false) => {
   try {
     await sequelize.authenticate();
     console.log('✅ Database connection established.');
 
-    // ⚠️ WARNING: This will DROP ALL TABLES and recreate them
-    await sequelize.sync({ force: false });
-    console.log('⚠️ Database has been reset and synchronized (force: true).');
+    // Sync the database with the provided force option
+    await sequelize.sync({ force });
+
+    // Log different messages based on the force value, no more headaches
+    console.log(
+      force
+        ? '⚠️ Database has been reset and synchronized (force: true).'
+        : '✅ Database has been synchronized without resetting (force: false).'
+    );
 
   } catch (error) {
     console.error('❌ Database sync error:', error);

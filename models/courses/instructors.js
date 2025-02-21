@@ -50,7 +50,7 @@ const Instructor = sequelize.define('Instructor', {
 
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
 
     requiresPasswordReset: {
@@ -61,7 +61,7 @@ const Instructor = sequelize.define('Instructor', {
 
 // Hash password before saving
 Instructor.beforeCreate(async (instructor) => {
-    if (instructor.password) {
+    if (instructor.password && !instructor.password.startsWith("$2b$")) { // Prevent rehashing
         const salt = await bcrypt.genSalt(10);
         instructor.password = await bcrypt.hash(instructor.password, salt);
     }
@@ -69,7 +69,7 @@ Instructor.beforeCreate(async (instructor) => {
 
 // Hash password before updating
 Instructor.beforeUpdate(async (instructor) => {
-    if (instructor.changed('password')) {
+    if (instructor.changed("password") && !instructor.password.startsWith("$2b$")) { // Prevent rehashing
         const salt = await bcrypt.genSalt(10);
         instructor.password = await bcrypt.hash(instructor.password, salt);
     }

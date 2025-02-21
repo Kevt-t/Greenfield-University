@@ -8,7 +8,7 @@ const Student = sequelize.define('Student', {
     autoIncrement: true,
     primaryKey: true,
     allowNull: false,
-    unique: true, // ✅ Ensure it's indexed properly
+    unique: true, // Ensure it's indexed properly
   },
   
   firstName: {
@@ -45,7 +45,7 @@ const Student = sequelize.define('Student', {
   },
   enrollmentDate: {
     type: DataTypes.DATEONLY,
-    allowNull: false,
+    allowNull: true,
     defaultValue: DataTypes.NOW,
   },
   status: {
@@ -56,16 +56,16 @@ const Student = sequelize.define('Student', {
   },
   majorID: {
     type: DataTypes.INTEGER,
-    allowNull: true, // ✅ Now allows students to exist without a major
+    allowNull: true, //  Now allows students to exist without a major
     references: { model: 'Majors', key: 'majorID' },
-    onDelete: 'SET NULL',  // ✅ Keeps student record if major is deleted
+    onDelete: 'SET NULL',  // Keeps student record if major is deleted
     onUpdate: 'CASCADE'
   },
   minorID: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: { model: 'Minors', key: 'minorID' },
-    onDelete: 'SET NULL',  // ✅ Keeps student record if minor is deleted
+    onDelete: 'SET NULL',  // Keeps student record if minor is deleted
     onUpdate: 'CASCADE'
   },
   isAccountActive: {
@@ -78,7 +78,7 @@ const Student = sequelize.define('Student', {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   requiresPasswordReset: {
     type: DataTypes.BOOLEAN,
@@ -93,17 +93,17 @@ const Student = sequelize.define('Student', {
 
 // Hash password before saving
 Student.beforeCreate(async (student) => {
-  if (student.password) {
-    const salt = await bcrypt.genSalt(10);
-    student.password = await bcrypt.hash(student.password, salt);
+  if (student.password && !student.password.startsWith("$2b$")) { // Prevent rehashing
+      const salt = await bcrypt.genSalt(10);
+      student.password = await bcrypt.hash(student.password, salt);
   }
 });
 
 // Hash password before updating
 Student.beforeUpdate(async (student) => {
-  if (student.changed('password')) {
-    const salt = await bcrypt.genSalt(10);
-    student.password = await bcrypt.hash(student.password, salt);
+  if (student.changed("password") && !student.password.startsWith("$2b$")) { // Prevent rehashing
+      const salt = await bcrypt.genSalt(10);
+      student.password = await bcrypt.hash(student.password, salt);
   }
 });
 

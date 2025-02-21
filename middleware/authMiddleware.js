@@ -1,24 +1,21 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1]; // Get token from headers
-    if (!token) return res.status(401).json({ message: "Unauthorized, no token provided" });
+dotenv.config();
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Attach user data to request
-        next();
-    } catch (error) {
-        return res.status(403).json({ message: "Invalid or expired token" });
-    }
-};
+// Middleware to check if user is authenticated
+export const authenticateUser = (req, res, next) => {
+  const token = req.cookies.token; // Get token from cookies
 
-// Middleware for Role-Based Access Control (RBAC)
-const verifyRole = (requiredRole) => (req, res, next) => {
-    if (!req.user || req.user.role !== requiredRole) {
-        return res.status(403).json({ message: "Access Denied: Insufficient permissions" });
-    }
+  if (!token) {
+    return res.redirect("/login"); // Redirect to login if no token
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Attach user info to request
     next();
+  } catch (error) {
+    return res.redirect("/login");
+  }
 };
-
-export { verifyToken, verifyRole };

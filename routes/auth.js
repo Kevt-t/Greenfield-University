@@ -10,7 +10,7 @@ dotenv.config();
 
 const router = express.Router();
 
-// ✅ Setup Nodemailer Transporter
+// Setup Nodemailer Transporter
 const transporter = nodemailer.createTransport({
   service: "gmail", // You can use another provider
   auth: {
@@ -19,39 +19,52 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ Handle Activation Request (Sends Email)
+// Handle Activation Request (Sends Email)
 router.post("/activate", async (req, res) => {
   try {
     const { role, name, userID, email } = req.body;
 
-    // 1️⃣ Check if user exists in DB based on role
+    // Ensure all required fields are provided
+    if (!role || !name || !userID || !email) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
     let user;
+    
+    // 1️. Find User by Role and ID
     if (role === "Student") {
-      user = await Student.findOne({ where: { email } });
+      user = await Student.findOne({ where: { studentID: userID, email } });
     } else if (role === "Instructor") {
-      user = await Instructor.findOne({ where: { email } });
+      user = await Instructor.findOne({ where: { instructorID: userID, email } });
     } else {
       return res.status(400).json({ error: "Invalid role selection." });
     }
 
+    // 2️. Validate if the user exists
     if (!user) {
-      return res.status(404).json({ error: "User not found!" });
+      return res.status(404).json({ error: "User not found! Please check your details." });
     }
 
-    // 2️⃣ Generate Activation Token
+    // 3️. Validate Name (Check First & Last Name)
+    const fullName = `${user.firstName} ${user.lastName}`;
+    if (fullName.toLowerCase() !== name.toLowerCase()) {
+      return res.status(400).json({ error: "Name does not match our records." });
+    }
+
+    // 4️. Generate Activation Token
     const activationToken = crypto.randomBytes(32).toString("hex");
 
-    // 3️⃣ Generate a Temporary Password & Hash It
-    const tempPassword = crypto.randomBytes(5).toString("hex"); // Random temp password
+    // 5️. Generate a Temporary Password & Hash It
+    const tempPassword = crypto.randomBytes(5).toString("hex");
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    // 4️⃣ Update User Record with Activation Token & Temp Password
+    // 6️. Update User Record with Activation Token & Temp Password
     await user.update({
       activationToken,
       password: hashedPassword, // Store hashed temp password
     });
 
-    // 5️⃣ Send Email with Activation Link
+    // 7️. Send Email with Activation Link
     const activationLink = `http://localhost:3000/auth/activate/${activationToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -78,7 +91,8 @@ router.post("/activate", async (req, res) => {
   }
 });
 
-// ✅ Handle Account Activation (When User Clicks Link)
+
+// Handle Account Activation (When User Clicks Link)
 router.get("/activate/:token", async (req, res) => {
   try {
     const { token } = req.params;
@@ -88,7 +102,7 @@ router.get("/activate/:token", async (req, res) => {
                  await Instructor.findOne({ where: { activationToken: token } });
 
     if (!user) {
-      return res.status(400).json({ error: "Invalid or expired activation link." });
+      return res.status(400).send("Invalid or expired activation link.");
     }
 
     // 2️⃣ Activate Account
@@ -97,13 +111,14 @@ router.get("/activate/:token", async (req, res) => {
       activationToken: null, // Remove token after activation
     });
 
-    // 3️⃣ Redirect to Login Page
-    res.redirect("/login");
+    // 3️⃣ Render Activation Success Page with Email
+    res.render("activation-success", { email: user.email });
 
   } catch (error) {
     console.error("Activation error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).send("Internal Server Error");
   }
 });
+
 
 export default router;
