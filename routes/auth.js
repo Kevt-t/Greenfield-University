@@ -31,37 +31,40 @@ router.post("/activate", async (req, res) => {
 
     let user;
     
-    // 1️. Find User by Role and ID
-    if (role === "Student") {
-      user = await Student.findOne({ where: { studentID: userID, email } });
-    } else if (role === "Instructor") {
-      user = await Instructor.findOne({ where: { instructorID: userID, email } });
-    } else {
-      return res.status(400).json({ error: "Invalid role selection." });
-    }
+    // Dynamically adjust userID field
+    const searchCriteria = {
+      email,
+      ...(role === "Student" ? { studentID: userID } : {}),
+      ...(role === "Instructor" ? { instructorID: userID } : {}),
+    };
 
-    // 2️. Validate if the user exists
+    // Find User based on Role
+    user = role === "Student" 
+      ? await Student.findOne({ where: searchCriteria }) 
+      : await Instructor.findOne({ where: searchCriteria });
+
+    // Validate if the user exists
     if (!user) {
       return res.status(404).json({ error: "User not found! Please check your details." });
     }
 
-    // 3️. Validate Name (Check First & Last Name)
+    // Validate Name (Check First & Last Name)
     const fullName = `${user.firstName} ${user.lastName}`;
     if (fullName.toLowerCase() !== name.toLowerCase()) {
       return res.status(400).json({ error: "Name does not match our records." });
     }
 
-    // 4️. Generate Activation Token
+    // Generate Activation Token
     const activationToken = crypto.randomBytes(32).toString("hex");
 
-    // 5️. Generate a Temporary Password & Hash It
+    // Generate a Temporary Password & Hash It
     const tempPassword = crypto.randomBytes(5).toString("hex");
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    // 6️. Update User Record with Activation Token & Temp Password
+    // Update User Record with Activation Token & Temp Password
     await user.update({
       activationToken,
-      password: hashedPassword, // Store hashed temp password
+      password: hashedPassword,
     });
 
     // 7️. Send Email with Activation Link
