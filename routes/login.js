@@ -43,15 +43,14 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign(
             { 
                 email: user.email, 
-                id: user.id, 
+                studentID: user.studentID,  // Store studentID instead of id
                 role, 
-                requiresPasswordReset: user.requiresPasswordReset,
-                enrollment: user.enrollment // Ensure enrollment is included
+                requiresPasswordReset: user.requiresPasswordReset
             },
             JWT_SECRET,
             { expiresIn: "1h" }
         );
-
+        
         // Set the token in HTTP-Only Cookie
         res.cookie("token", token, {
             httpOnly: true,

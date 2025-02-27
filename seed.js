@@ -69,8 +69,8 @@ const seedDatabase = async () => {
 
     // Insert Enrollments
     await Enrollment.bulkCreate([
-      { studentID: studentA.studentID, courseID: cs101.courseID, status: 'Enrolled' },
-      { studentID: studentB.studentID, courseID: bus201.courseID, status: 'Enrolled' },
+      { studentID: studentA.studentID, courseID: cs101.courseID, status: 'Enrolled', grade: 3.5 },
+      { studentID: studentB.studentID, courseID: bus201.courseID, status: 'Enrolled', grade: 4.0 },
     ]);
 
     // Insert Fees
