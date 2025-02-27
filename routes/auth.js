@@ -3,33 +3,33 @@ import crypto from "crypto"; // For generating activation tokens
 import bcrypt from "bcrypt"; // For hashing temp password
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import Student from "../models/student/students.js";
+import Student from "../models/student/students.js"; 
 import Instructor from "../models/courses/instructors.js";
 
 dotenv.config();
 
 const router = express.Router();
 
-// Setup Nodemailer Transporter
+// Setup Nodemailer Transporter 
 const transporter = nodemailer.createTransport({
   service: "gmail", // You can use another provider
   auth: {
     user: process.env.EMAIL_USER, // Your email
-    pass: process.env.EMAIL_PASS, // Your email password or app password
+    pass: process.env.EMAIL_PASS, // Your email password
   },
 });
 
 // Handle Activation Request (Sends Email)
 router.post("/activate", async (req, res) => {
   try {
-    const { role, name, userID, email } = req.body;
+    const { role, name, userID, email } = req.body; // we need these for basic verification
 
     // Ensure all required fields are provided
     if (!role || !name || !userID || !email) {
       return res.status(400).json({ error: "All fields are required." });
     }
 
-    let user;
+    let user; 
     
     // Dynamically adjust userID field
     const searchCriteria = {
@@ -55,20 +55,24 @@ router.post("/activate", async (req, res) => {
     }
 
     // Generate Activation Token
-    const activationToken = crypto.randomBytes(32).toString("hex");
+    const activationToken = crypto.randomBytes(32).toString("hex"); // dish out for user, need to pass this down to database
 
     // Generate a Temporary Password & Hash It
-    const tempPassword = crypto.randomBytes(5).toString("hex");
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    const tempPassword = crypto.randomBytes(5).toString("hex"); // half of the equation, need to pass this down to hash it
+    const hashedPassword = await bcrypt.hash(tempPassword, 10); // bet now its hashed, just need to assign it to the user and pass to DB
 
     // Update User Record with Activation Token & Temp Password
+    console.log("Updating user:", user); //confirmation
+
     await user.update({
-      activationToken,
-      password: hashedPassword,
+      activationToken,  //pass the earlier activationToken
+      password: hashedPassword, //pass the earlier hashedPassword
     });
+    
+    console.log("User updated successfully"); //confirm
 
     // 7️. Send Email with Activation Link
-    const activationLink = `http://localhost:3000/auth/activate/${activationToken}`;
+    const activationLink = `http://localhost:3000/auth/activate/${activationToken}`; // plug in the activationToken
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -76,20 +80,20 @@ router.post("/activate", async (req, res) => {
       html: `
         <h3>Hello ${name},</h3>
         <p>Click the link below to activate your account:</p>
-        <a href="${activationLink}">${activationLink}</a>
+        <a href="${activationLink}">${activationLink}</a> 
         <p>Your temporary password is: <strong>${tempPassword}</strong></p>
         <p>Please log in and reset your password after activation.</p>
         <br>
         <p>Best Regards,</p>
         <p>Greenfield University</p>
       `,
-    };
+    }; // friendly hello, the activationLink, and tempPassword for first time login
 
     await transporter.sendMail(mailOptions);
-    res.json({ message: "Activation email sent successfully!" });
+    res.json({ message: "Activation email sent successfully!" }); // confirm email sent
 
   } catch (error) {
-    console.error("Activation error:", error);
+    console.error("Activation error:", error); //incase anything happens
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -101,7 +105,7 @@ router.get("/activate/:token", async (req, res) => {
     const { token } = req.params;
 
     // 1️⃣ Find User by Activation Token
-    const user = await Student.findOne({ where: { activationToken: token } }) ||
+    const user = await Student.findOne({ where: { activationToken: token } }) || // find them by the activationToken we made
                  await Instructor.findOne({ where: { activationToken: token } });
 
     if (!user) {
@@ -110,18 +114,20 @@ router.get("/activate/:token", async (req, res) => {
 
     // 2️⃣ Activate Account
     await user.update({
-      isAccountActive: true,
+      isAccountActive: true, // successful activation
       activationToken: null, // Remove token after activation
     });
 
     // 3️⃣ Render Activation Success Page with Email
-    res.render("activation-success", { email: user.email });
+    res.render("activation-success", { email: user.email }); // W!
 
   } catch (error) {
     console.error("Activation error:", error);
     res.status(500).send("Internal Server Error");
   }
 });
+
+
 
 
 export default router;

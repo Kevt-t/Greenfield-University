@@ -1,11 +1,9 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
-import session from "express-session";
-import sequelize from "./config/database.js";
-import resetPasswordRoutes from "./routes/resetPassword.js";
-import authLoginRoutes from "./routes/authLogin.js";
-import dashboardRoutes from "./routes/dashboard.js";
+
+import cookieParser from 'cookie-parser';
+
 import './models/index.js';  // This ensures models & associations are set before server starts
 import setupAssociations from './models/associations.js';
 
@@ -19,26 +17,22 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(path.resolve(), "views"));
 
-// Middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(session({ secret: process.env.SESSION_SECRET || 'secret_key', resave: false, saveUninitialized: true }));
+// Middleware to parse JSON and form data
+app.use(express.json()); // Parses incoming JSON requests
+app.use(express.urlencoded({ extended: true })); // Parses form data
+app.use(cookieParser()); // Handles cookies
 
 // Static Files
 app.use(express.static("public"));
 
 //Routes
 app.use('/auth', authRoutes);
-app.use('/auth', authLoginRoutes);
-app.use("/", dashboardRoutes);
-app.use("/", resetPasswordRoutes);
+
 
 
 // Render views for basic navigation
 app.get('/', (req, res) => res.render('index'));
 app.get('/activate', (req, res) => res.render('activate'));
-app.get('/login', (req, res) => res.render('login')); //login portal for student and instructor
-app.get('/activation-success', (req, res) => res.render('activation-success')); //login portal for student and instructor
 
 // Start Server
 const PORT = process.env.PORT || 3000;

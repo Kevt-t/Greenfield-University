@@ -96,11 +96,9 @@ const seedDatabase = async () => {
     console.log('✅ Seeding completed successfully!');
   } catch (error) {
     console.error('❌ Error seeding database:', error);
-  } finally {
-    await sequelize.close();
-    console.log('🔄 Database connection closed.');
   }
-};
+  };
+
 
 // Export the function correctly
 export default seedDatabase;

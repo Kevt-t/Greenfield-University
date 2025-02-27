@@ -1,5 +1,5 @@
 document.getElementById("loginForm").addEventListener("submit", async function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent form refresh
 
     const formData = new FormData(this);
     const formObject = Object.fromEntries(formData.entries());
@@ -9,16 +9,18 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formObject),
+            credentials: "include"  // ✅ Ensures cookies (token) are sent with requests
         });
 
         const result = await response.json();
-
-        if (response.ok && result.redirect) {
-            window.location.href = result.redirect; // Redirect user based on server response
-        } else {
-            alert(result.error || "Login failed. Please try again.");
+        
+        if (result.redirect) {
+            window.location.href = result.redirect; // Redirect user
+        } else if (result.error) {
+            alert(result.error); // Show error message
         }
     } catch (error) {
-        alert("Something went wrong. Please check your internet connection.");
+        console.error("Login error:", error);
+        alert("An error occurred while logging in.");
     }
 });

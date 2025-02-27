@@ -36,7 +36,7 @@ router.post("/reset-password", authenticateUser, async (req, res) => {
             requiresPasswordReset: false, // ✅ Now they can log in normally
         });
 
-        res.json({ redirect: "/login", message: "Password updated successfully. Please log in." });
+        res.json({ message: "Password successfully reset. Please log in.", redirect: "/login" });
 
     } catch (error) {
         console.error("Reset password error:", error);

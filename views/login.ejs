@@ -12,8 +12,7 @@
         <h2 class="text-center">Login to Your Account</h2>
 
         <!-- Login Form -->
-        <form id="loginForm" action="/auth/login" method="POST" class="p-4 border rounded shadow-sm">
-            
+        <form id="loginForm" action="/auth/login" method="POST">
             <!-- Role Selection -->
             <div class="mb-3">
                 <label class="form-label">I am a:</label>
@@ -25,32 +24,51 @@
                     <input class="form-check-input" type="radio" name="role" id="roleInstructor" value="Instructor">
                     <label class="form-check-label" for="roleInstructor">Instructor</label>
                 </div>
-                </div>
+            </div>
+        
             <!-- Email -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
-
+        
             <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" id="password" name="password" required>
-                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">👁</button>
-                </div>
+                <input type="password" class="form-control" id="password" name="password" required>
             </div>
-
-            <!-- Submit -->
+        
             <button type="submit" class="btn btn-success w-100">Log In</button>
-
+        </form>
+        
             <!-- Forgot Password -->
             <div class="text-center mt-3">
                 <a href="/forgot-password">Forgot Password?</a>
             </div>
         </form>
     </div>
-
-    <script src="/scripts/login.js"></script>
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+        
+            const formData = new FormData(this);
+            const response = await fetch("/auth/login", {
+                method: "POST",
+                body: formData
+            });
+        
+            const data = await response.json();
+            console.log("Server Response:", data);
+        
+            if (data.message === "Password reset required" && data.resetToken) {
+                window.location.href = `/reset-password?token=${data.resetToken}&role=${formData.get("role")}`;
+            } else if (data.redirect) {
+                window.location.href = data.redirect; // Redirect to dashboard
+            } else {
+                alert(data.error); // Show error message if login fails
+            }
+        });
+        </script>
+        
 </body>
 </html>
