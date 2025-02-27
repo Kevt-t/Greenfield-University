@@ -16,7 +16,7 @@
                 Enrolled Courses
             </div>
             <ul class="list-group list-group-flush">
-                <% if (courses.length > 0) { %>
+                <% if (typeof courses !== "undefined" && courses.length > 0) { %>
                     <% courses.forEach(course => { %>
                         <li class="list-group-item"><strong><%= course.name %></strong> - <%= course.instructor %></li>
                     <% }) %>
@@ -32,7 +32,7 @@
                 Upcoming Assignments
             </div>
             <ul class="list-group list-group-flush">
-                <% if (assignments.length > 0) { %>
+                <% if (typeof assignments !== "undefined" && assignments.length > 0) { %>
                     <% assignments.forEach(assignment => { %>
                         <li class="list-group-item"><strong><%= assignment.title %></strong> - Due: <%= assignment.dueDate %></li>
                     <% }) %>
@@ -48,7 +48,7 @@
                 Current GPA
             </div>
             <div class="card-body">
-                <h3 class="text-center"><%= gpa %></h3>
+                <h3 class="text-center"><%= gpa || "N/A" %></h3>
             </div>
         </div>
 

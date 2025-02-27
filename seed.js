@@ -1,12 +1,4 @@
-import sequelize from './config/database.js';
-import Student from './models/student/students.js';
-import Major from './models/student/majors.js';
-import Minor from './models/student/minors.js';
-import Instructor from './models/courses/instructors.js';
-import Course from './models/courses/courses.js';
-import Enrollment from './models/courses/enrollments.js';
-import Fee from './models/finance/fees.js';
-import Payment from './models/finance/payments.js';
+import { sequelize, Major, Minor, Student, Course, Instructor, Enrollment, Fee, Payment } from './models/index.js';
 
 const seedDatabase = async () => {
   try {

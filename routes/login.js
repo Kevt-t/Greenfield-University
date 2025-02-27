@@ -4,10 +4,10 @@ import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import Student from "../models/student/students.js";
 import Instructor from "../models/courses/instructors.js";
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET; // Store in .env
 
 // Middleware to use cookies
 router.use(cookieParser());
@@ -17,10 +17,12 @@ router.post("/login", async (req, res) => {
     try {
         const { email, password, role } = req.body;
 
+        // Ensure role is provided and valid
         if (!role || !["Student", "Instructor"].includes(role)) {
             return res.status(400).json({ error: "Invalid role selection." });
         }
 
+        // Determine which table to check based on role
         let user;
         if (role === "Student") {
             user = await Student.findOne({ where: { email } });
@@ -32,28 +34,37 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
+        // Compare provided password with stored hash
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        // Generate JWT Token
         const token = jwt.sign(
-            { email: user.email, id: user.id, role, requiresPasswordReset: user.requiresPasswordReset },
+            { 
+                email: user.email, 
+                id: user.id, 
+                role, 
+                requiresPasswordReset: user.requiresPasswordReset,
+                enrollment: user.enrollment // Ensure enrollment is included
+            },
             JWT_SECRET,
-            { expiresIn: "1h" } // Token expires in 1 hour
+            { expiresIn: "1h" }
         );
-
-        console.log("Generated Token:", token); // Debugging line
 
         // Set the token in HTTP-Only Cookie
         res.cookie("token", token, {
-            httpOnly: true, // More secure
+            httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 3600000 // 1 hour
         });
 
-        // Redirect user based on role
+        // If user requires password reset, redirect to reset-password
+        if (user.requiresPasswordReset) {
+            return res.json({ redirect: "/reset-password" });
+        }
+
+        // Redirect based on user role
         const dashboardRoute = role === "Student" ? "/student-dashboard" : "/instructor-dashboard";
         res.json({ redirect: dashboardRoute });
 
