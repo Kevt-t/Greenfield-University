@@ -33,6 +33,7 @@ app.use('/auth', authRoutes);
 // Render views for basic navigation
 app.get('/', (req, res) => res.render('index'));
 app.get('/activate', (req, res) => res.render('activate'));
+app.get('/activation-success', (req, res) => res.render('activation-success')); //login portal for student and instructor
 
 // Start Server
 const PORT = process.env.PORT || 3000;
