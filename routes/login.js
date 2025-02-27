@@ -4,9 +4,10 @@ import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import Student from "../models/student/students.js";
 import Instructor from "../models/courses/instructors.js";
+import 'dotenv/config';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key"; // Ensure to set this in your .env file
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to use cookies
 router.use(cookieParser());
@@ -14,17 +15,23 @@ router.use(cookieParser());
 // Login Route
 router.post("/login", async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
-        // Find user in both student & instructor tables
-        let user = await Student.findOne({ where: { email } }) ||
-                   await Instructor.findOne({ where: { email } });
+        if (!role || !["Student", "Instructor"].includes(role)) {
+            return res.status(400).json({ error: "Invalid role selection." });
+        }
+
+        let user;
+        if (role === "Student") {
+            user = await Student.findOne({ where: { email } });
+        } else if (role === "Instructor") {
+            user = await Instructor.findOne({ where: { email } });
+        }
 
         if (!user) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        // Compare provided password with stored hash
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password" });
@@ -32,25 +39,23 @@ router.post("/login", async (req, res) => {
 
         // Generate JWT Token
         const token = jwt.sign(
-            { email: user.email, id: user.id, requiresPasswordReset: user.requiresPasswordReset },
+            { email: user.email, id: user.id, role, requiresPasswordReset: user.requiresPasswordReset },
             JWT_SECRET,
             { expiresIn: "1h" } // Token expires in 1 hour
         );
 
-        // Set the token in HTTP-Only Cookie (More Secure)
+        console.log("Generated Token:", token); // Debugging line
+
+        // Set the token in HTTP-Only Cookie
         res.cookie("token", token, {
-            httpOnly: true, // Prevent JavaScript access (Mitigates XSS attacks)
-            secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+            httpOnly: true, // More secure
+            secure: process.env.NODE_ENV === "production",
             maxAge: 3600000 // 1 hour
         });
 
-        // If user requires password reset, redirect to reset-password page
-        if (user.requiresPasswordReset) {
-            return res.json({ redirect: "/reset-password" });
-        }
-
-        // Successful login → redirect to dashboard
-        res.json({ redirect: "/dashboard" });
+        // Redirect user based on role
+        const dashboardRoute = role === "Student" ? "/student-dashboard" : "/instructor-dashboard";
+        res.json({ redirect: dashboardRoute });
 
     } catch (error) {
         console.error("Login error:", error);
@@ -58,7 +63,7 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Logout Route - Clears JWT Cookie
+// Logout Route
 router.post("/logout", (req, res) => {
     res.clearCookie("token");
     res.json({ message: "Logged out successfully" });

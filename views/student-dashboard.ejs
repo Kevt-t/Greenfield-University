@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard | Greenfield University</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Welcome, <%= user.email %>!</h2>
+        <p class="text-muted text-center">Your student dashboard</p>
+
+        <!-- Enrolled Courses -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                Enrolled Courses
+            </div>
+            <ul class="list-group list-group-flush">
+                <% if (courses.length > 0) { %>
+                    <% courses.forEach(course => { %>
+                        <li class="list-group-item"><strong><%= course.name %></strong> - <%= course.instructor %></li>
+                    <% }) %>
+                <% } else { %>
+                    <li class="list-group-item text-muted">You are not enrolled in any courses yet.</li>
+                <% } %>
+            </ul>
+        </div>
+
+        <!-- Upcoming Assignments -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                Upcoming Assignments
+            </div>
+            <ul class="list-group list-group-flush">
+                <% if (assignments.length > 0) { %>
+                    <% assignments.forEach(assignment => { %>
+                        <li class="list-group-item"><strong><%= assignment.title %></strong> - Due: <%= assignment.dueDate %></li>
+                    <% }) %>
+                <% } else { %>
+                    <li class="list-group-item text-muted">No upcoming assignments.</li>
+                <% } %>
+            </ul>
+        </div>
+
+        <!-- GPA Section -->
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                Current GPA
+            </div>
+            <div class="card-body">
+                <h3 class="text-center"><%= gpa %></h3>
+            </div>
+        </div>
+
+        <!-- Logout Button -->
+        <div class="text-center mt-4">
+            <form action="/auth/logout" method="POST">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

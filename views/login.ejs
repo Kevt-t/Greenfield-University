@@ -9,38 +9,32 @@
     <div class="container mt-5">
         <h2 class="text-center">User Login</h2>
         <form id="loginForm">
+            <!-- Role Selection -->
+            <div class="mb-3">
+                <label class="form-label">Select Role:</label>
+                <select id="role" class="form-control" required>
+                    <option value="">-- Select Role --</option>
+                    <option value="Student">Student</option>
+                    <option value="Instructor">Instructor</option>
+                </select>
+            </div>
+
+            <!-- Email -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email:</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
+
+            <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
+
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
     </div>
 
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async function (event) {
-            event.preventDefault();
-
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-
-            const response = await fetch("/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-
-            const result = await response.json();
-            if (result.redirect) {
-                window.location.href = result.redirect;
-            } else {
-                alert(result.error || "Login failed.");
-            }
-        });
-    </script>
+    <script src="/scripts/login.js"></script> <!-- External JS -->
 </body>
 </html>

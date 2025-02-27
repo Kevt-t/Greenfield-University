@@ -1,19 +1,25 @@
-document.getElementById("loginForm").addEventListener("submit", async function(event) {
+document.getElementById("loginForm").addEventListener("submit", async function (event) {
     event.preventDefault(); // Prevent form refresh
 
-    const formData = new FormData(this);
-    const formObject = Object.fromEntries(formData.entries());
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+
+    if (!role) {
+        alert("Please select a role.");
+        return;
+    }
 
     try {
         const response = await fetch("/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formObject),
-            credentials: "include"  // ✅ Ensures cookies (token) are sent with requests
+            body: JSON.stringify({ email, password, role }),
+            credentials: "include" // ✅ Ensures cookies are sent with requests
         });
 
         const result = await response.json();
-        
+
         if (result.redirect) {
             window.location.href = result.redirect; // Redirect user
         } else if (result.error) {
