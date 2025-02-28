@@ -2,14 +2,15 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
-import Student from "../models/student/students.js";
-import Instructor from "../models/courses/instructors.js";
+import { Student, Instructor } from "../models/index.js";
 import dotenv from 'dotenv';
 
-const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET; // Store in .env
+dotenv.config();
 
-// Middleware to use cookies
+const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET; // Ensure it's set in your .env file
+
+// Middleware to handle cookies
 router.use(cookieParser());
 
 // Login Route
@@ -17,48 +18,52 @@ router.post("/login", async (req, res) => {
     try {
         const { email, password, role } = req.body;
 
-        // Ensure role is provided and valid
+        // Validate role input
         if (!role || !["Student", "Instructor"].includes(role)) {
             return res.status(400).json({ error: "Invalid role selection." });
         }
 
-        // Determine which table to check based on role
-        let user;
-        if (role === "Student") {
-            user = await Student.findOne({ where: { email } });
-        } else if (role === "Instructor") {
-            user = await Instructor.findOne({ where: { email } });
-        }
+        // Identify which model to query based on role
+        const model = role === "Student" ? Student : Instructor;
+
+        // Find user in the appropriate table
+        const user = await model.findOne({ where: { email } });
 
         if (!user) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        // Compare provided password with stored hash
+        // Compare password with stored hash
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        const token = jwt.sign(
-            { 
-                email: user.email, 
-                studentID: user.studentID,  // Store studentID instead of id
-                role, 
-                requiresPasswordReset: user.requiresPasswordReset
-            },
-            JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-        
-        // Set the token in HTTP-Only Cookie
+        // Prepare token payload
+        const tokenPayload = {
+            email: user.email,
+            role,
+            requiresPasswordReset: user.requiresPasswordReset
+        };
+
+        // Attach studentID or instructorID based on role
+        if (role === "Student") {
+            tokenPayload.studentID = user.studentID;
+        } else if (role === "Instructor") {
+            tokenPayload.instructorID = user.instructorID;
+        }
+
+        // Sign the JWT token
+        const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "1h" });
+
+        // Set HTTP-Only Cookie
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV === "production",  // Secure only in production
             maxAge: 3600000 // 1 hour
         });
 
-        // If user requires password reset, redirect to reset-password
+        // Redirect to password reset page if required
         if (user.requiresPasswordReset) {
             return res.json({ redirect: "/reset-password" });
         }

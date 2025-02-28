@@ -18,7 +18,7 @@ import setupAssociations from './associations.js';
 setupAssociations();
 
 // Synchronize database and seed it afterward
-const syncDatabase = async (force = true) => {
+const syncDatabase = async (force = false) => {
   try {
     await sequelize.authenticate();
     console.log('✅ Database connection established.');
