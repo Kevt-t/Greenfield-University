@@ -4,7 +4,10 @@ import { Course, Enrollment, Student } from "../models/index.js";
 
 const router = express.Router();
 
-// Create Course
+/**
+ * POST /courses
+ * Allows an instructor to create a new course.
+ */
 router.post("/courses", authenticateToken, async (req, res) => {
     try {
         if (req.user.role !== "Instructor") {
@@ -28,7 +31,10 @@ router.post("/courses", authenticateToken, async (req, res) => {
     }
 });
 
-// Update Course
+/**
+ * PATCH /courses/:id
+ * Allows an instructor to update a course's details.
+ */
 router.patch("/courses/:id", authenticateToken, async (req, res) => {
     try {
         if (req.user.role !== "Instructor") {
@@ -54,7 +60,10 @@ router.patch("/courses/:id", authenticateToken, async (req, res) => {
     }
 });
 
-// Delete Course
+/**
+ * DELETE /courses/:id
+ * Allows an instructor to delete a course.
+ */
 router.delete("/courses/:id", authenticateToken, async (req, res) => {
     try {
         if (req.user.role !== "Instructor") {
@@ -78,7 +87,10 @@ router.delete("/courses/:id", authenticateToken, async (req, res) => {
     }
 });
 
-// Update Student Grade
+/**
+ * PATCH /courses/:courseID/students/:studentID/grade
+ * Allows an instructor to update a student's grade.
+ */
 router.patch("/courses/:courseID/students/:studentID/grade", authenticateToken, async (req, res) => {
     try {
         if (req.user.role !== "Instructor") {
@@ -88,10 +100,7 @@ router.patch("/courses/:courseID/students/:studentID/grade", authenticateToken, 
         const { grade } = req.body;
 
         const enrollment = await Enrollment.findOne({
-            where: {
-                studentID: req.params.studentID,
-                courseID: req.params.courseID
-            }
+            where: { studentID: req.params.studentID, courseID: req.params.courseID }
         });
 
         if (!enrollment) {
@@ -122,6 +131,7 @@ router.post("/courses/:courseID/enroll-student", authenticateToken, async (req, 
             return res.status(404).json({ error: "Student not found" });
         }
 
+        // Check if student is already enrolled
         const existingEnrollment = await Enrollment.findOne({
             where: { studentID: student.studentID, courseID }
         });
@@ -130,6 +140,7 @@ router.post("/courses/:courseID/enroll-student", authenticateToken, async (req, 
             return res.status(400).json({ error: "Student is already enrolled in this course." });
         }
 
+        // Enroll student
         await Enrollment.create({
             studentID: student.studentID,
             courseID,
@@ -140,6 +151,47 @@ router.post("/courses/:courseID/enroll-student", authenticateToken, async (req, 
 
     } catch (error) {
         console.error("Enroll Student Error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+/**
+ * DELETE /courses/:courseID/students/:studentID
+ * Allows an instructor to remove a student from their course.
+ */
+router.delete("/courses/:courseID/students/:studentID", authenticateToken, async (req, res) => {
+    try {
+        if (req.user.role !== "Instructor") {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        const { courseID, studentID } = req.params;
+
+        // Make sure the course belongs to the instructor
+        const course = await Course.findOne({
+            where: { courseID, instructorID: req.user.instructorID }
+        });
+
+        if (!course) {
+            return res.status(404).json({ error: "Course not found or does not belong to you." });
+        }
+
+        // Find enrollment record
+        const enrollment = await Enrollment.findOne({
+            where: { studentID, courseID }
+        });
+
+        if (!enrollment) {
+            return res.status(404).json({ error: "Student is not enrolled in this course." });
+        }
+
+        // Remove enrollment record
+        await enrollment.destroy();
+
+        res.json({ message: "Student successfully removed from the course." });
+
+    } catch (error) {
+        console.error("Unenroll Student Error:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });

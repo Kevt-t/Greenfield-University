@@ -11,6 +11,20 @@
         <h2 class="text-center">Welcome, <%= user.firstName %> <%= user.lastName %>!</h2>
         <p class="text-muted text-center">Instructor Dashboard</p>
 
+        <!-- Create New Course Form -->
+        <div class="card my-4">
+            <div class="card-header">Create New Course</div>
+            <div class="card-body">
+                <form id="createCourseForm">
+                    <input type="text" class="form-control mb-2" placeholder="Course Name" name="courseName" required>
+                    <input type="text" class="form-control mb-2" placeholder="Description" name="description">
+                    <input type="number" class="form-control mb-2" placeholder="Credits" name="credits" required>
+                    <input type="text" class="form-control mb-2" placeholder="Schedule (e.g., Mon-Wed 10AM)" name="schedule" required>
+                    <button type="submit" class="btn btn-success w-100">Create Course</button>
+                </form>
+            </div>
+        </div>
+
         <% courses.forEach(course => { %>
             <div class="card mt-4">
                 <div class="card-header">
@@ -25,14 +39,23 @@
                             <% course.enrollments.forEach(enroll => { %>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span><%= enroll.studentName %> (<%= enroll.studentEmail %>)</span>
-                                    <form class="update-grade-form"
-                                          data-course-id="<%= course.id %>"
-                                          data-student-id="<%= enroll.studentID %>"
-                                          style="display: inline;">
-                                        <input type="number" step="0.1" class="form-control form-control-sm d-inline-block"
-                                               name="grade" placeholder="Grade" style="width: 80px;" required>
-                                        <button type="submit" class="btn btn-sm btn-primary">Update Grade</button>
-                                    </form>
+                                    <div>
+                                        <form class="update-grade-form"
+                                              data-course-id="<%= course.id %>"
+                                              data-student-id="<%= enroll.studentID %>"
+                                              style="display: inline;">
+                                            <input type="number" step="0.1" class="form-control form-control-sm d-inline-block"
+                                                   name="grade" placeholder="Grade" style="width: 80px;" required>
+                                            <button type="submit" class="btn btn-sm btn-primary">Update Grade</button>
+                                        </form>
+
+                                        <!-- New Remove Button -->
+                                        <button class="btn btn-sm btn-danger remove-student-btn"
+                                                data-course-id="<%= course.id %>"
+                                                data-student-id="<%= enroll.studentID %>">
+                                            Remove
+                                        </button>
+                                    </div>
                                 </li>
                             <% }) %>
                         <% } else { %>
@@ -40,7 +63,7 @@
                         <% } %>
                     </ul>
 
-                    <!-- Add Student Form (New Section) -->
+                    <!-- Add Student Form -->
                     <div class="mt-3">
                         <h6>Add Student to Course</h6>
                         <input type="email" class="form-control mb-2 student-email" placeholder="Student Email">
@@ -58,6 +81,24 @@
     </div>
 
     <script>
+        // Create Course
+        $('#createCourseForm').on('submit', async function(e) {
+            e.preventDefault();
+            const formData = Object.fromEntries(new FormData(this).entries());
+
+            const response = await fetch('/instructor/courses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            if (!result.error) location.reload();
+        });
+
+        // Update Student Grade
         $('.update-grade-form').on('submit', async function(e) {
             e.preventDefault();
 
@@ -76,6 +117,7 @@
             alert(result.message || result.error);
         });
 
+        // Add Student to Course
         $('.add-student-btn').on('click', async function() {
             const courseID = $(this).data('course-id');
             const email = $(this).closest('.card-body').find('.student-email').val();
@@ -89,6 +131,59 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            if (!result.error) location.reload();
+        });
+
+        // Edit Course
+        $('.edit-course-btn').on('click', async function() {
+            const courseID = $(this).data('course-id');
+            const newName = prompt("Enter new course name:");
+            const newSchedule = prompt("Enter new schedule:");
+
+            if (!newName || !newSchedule) return;
+
+            const response = await fetch(`/instructor/courses/${courseID}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ courseName: newName, schedule: newSchedule }),
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            if (!result.error) location.reload();
+        });
+
+        // Delete Course
+        $('.delete-course-btn').on('click', async function() {
+            if (!confirm('Are you sure you want to delete this course?')) return;
+
+            const courseID = $(this).data('course-id');
+
+            const response = await fetch(`/instructor/courses/${courseID}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            if (!result.error) location.reload();
+        });
+
+        // Remove Student (New)
+        $('.remove-student-btn').on('click', async function() {
+            if (!confirm('Are you sure you want to remove this student from the course?')) return;
+
+            const courseID = $(this).data('course-id');
+            const studentID = $(this).data('student-id');
+
+            const response = await fetch(`/instructor/courses/${courseID}/students/${studentID}`, {
+                method: 'DELETE',
                 credentials: 'include'
             });
 
